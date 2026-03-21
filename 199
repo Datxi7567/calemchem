@@ -1,5 +1,6 @@
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
 
 local player = Players.LocalPlayer
 local STOP = false
@@ -28,11 +29,11 @@ task.spawn(function()
     local levelValue = player:WaitForChild("Data"):WaitForChild("Level")
 
     while true do
-        if levelValue.Value >= 100 and not triggered then
+        if levelValue.Value >= 200 and not triggered then
             triggered = true
             STOP = true
 
-            warn("Reached level 100 → STOP + RESET")
+            warn("Reached level 200 → STOP + RESET")
 
             -- dừng toàn bộ
             stopAll()
@@ -131,7 +132,8 @@ local function startScript(char)
         local minDist = 1000
 
         for _, npc in pairs(workspace:WaitForChild("NPCs"):GetChildren()) do
-            if npc.Name:find("Thief") and npc:FindFirstChild("HumanoidRootPart") then
+            -- Chỉ tìm Thief1-5
+            if (npc.Name == "Thief1" or npc.Name == "Thief2" or npc.Name == "Thief3" or npc.Name == "Thief4" or npc.Name == "Thief5") and npc:FindFirstChild("HumanoidRootPart") then
                 if npc.Humanoid.Health > 0 then
                     local dist = (npc.HumanoidRootPart.Position - root.Position).Magnitude
                     if dist < minDist then
@@ -167,6 +169,8 @@ local function startScript(char)
     end
 
     -- ===== FOLLOW =====
+    local lastNPCPosition = nil
+    
     task.spawn(function()
         while not STOP do
             local npc = getNearestNPC()
@@ -181,16 +185,25 @@ local function startScript(char)
                     local head = npc:FindFirstChild("Head") or npc:FindFirstChild("HumanoidRootPart")
 
                     if head then
-                        local targetPos = head.Position + Vector3.new(0, 7, 0)
-                        local direction = (targetPos - root.Position)
+                        lastNPCPosition = head.Position + Vector3.new(0, 7, 0)
+                        local direction = (lastNPCPosition - root.Position)
 
-                        root.Velocity = direction * 3
+                        root.Velocity = direction * 5
                     end
 
                     RunService.Heartbeat:Wait()
                 end
             else
-                task.wait(0.3)
+                -- Nếu không tìm thấy NPC, neo tại vị trí NPC cuối cùng
+                if lastNPCPosition then
+                    local direction = (lastNPCPosition - root.Position)
+                    root.Velocity = direction * 5
+                    root.CFrame = CFrame.new(lastNPCPosition)
+                else
+                    task.wait(0.3)
+                end
+
+                RunService.Heartbeat:Wait()
             end
         end
     end)
@@ -205,7 +218,7 @@ local function startScript(char)
             local level = player.Data.Level.Value
             local stat = player.Data.StatPoints.Value
 
-            if level >= 1 and level <= 99 and stat > 0 then
+            if level >= 1 and level <= 200 and stat > 0 then
                 statRemote:FireServer("Melee", stat)
             end
 
