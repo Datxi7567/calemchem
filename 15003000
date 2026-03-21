@@ -29,7 +29,7 @@ task.spawn(function()
     local levelValue = player:WaitForChild("Data"):WaitForChild("Level")
 
     while true do
-        if levelValue.Value >= 1500 and not triggered then
+        if levelValue.Value >= 3000 and not triggered then
             triggered = true
             STOP = true
 
@@ -183,7 +183,7 @@ local function startScript(char)
                     local head = npc:FindFirstChild("Head") or npc:FindFirstChild("HumanoidRootPart")
 
                     if head then
-                        lastNPCPosition = head.Position + Vector3.new(0, 8.5, 0)
+                        lastNPCPosition = head.Position + Vector3.new(0, 8.2, 0)
                         local direction = (lastNPCPosition - root.Position)
 
                         root.Velocity = direction * 5
@@ -219,7 +219,7 @@ local function startScript(char)
             local level = player.Data.Level.Value
             local stat = player.Data.StatPoints.Value
 
-            if level >= 1 and level <= 1500 and stat > 0 then
+            if level >= 1 and level <= 3000 and stat > 0 then
                 if defenseSpent < maxDefense then
                     -- Allocate to Defense first (up to 200)
                     statRemote:FireServer("Defense", stat)
