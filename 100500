@@ -219,7 +219,7 @@ local function startScript(char)
             local level = player.Data.Level.Value
             local stat = player.Data.StatPoints.Value
 
-            if level >= 1 and level <= 400 and stat > 0 then
+            if level >= 1 and level <= 500 and stat > 0 then
                 if defenseSpent < maxDefense then
                     -- Allocate to Defense first (up to 200)
                     statRemote:FireServer("Defense", stat)
