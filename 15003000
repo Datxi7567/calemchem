@@ -89,7 +89,7 @@ local function startScript(char)
     end))
 
     -- ===== EQUIP =====
-    local tool = player.Backpack:WaitForChild("Combat")
+    local tool = player.Backpack:WaitForChild("Gryphon")
     humanoid:EquipTool(tool)
 
     -- ===== NẰM =====
@@ -226,7 +226,7 @@ local function startScript(char)
                     defenseSpent += stat
                 else
                     -- After 200 Defense, allocate remaining to Melee
-                    statRemote:FireServer("Melee", stat)
+                    statRemote:FireServer("Sword", stat)
                 end
             end
 
