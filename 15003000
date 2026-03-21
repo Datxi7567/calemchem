@@ -183,7 +183,7 @@ local function startScript(char)
                     local head = npc:FindFirstChild("Head") or npc:FindFirstChild("HumanoidRootPart")
 
                     if head then
-                        lastNPCPosition = head.Position + Vector3.new(0, 8.2, 0)
+                        lastNPCPosition = head.Position + Vector3.new(0, 8.3, 0)
                         local direction = (lastNPCPosition - root.Position)
 
                         root.Velocity = direction * 5
