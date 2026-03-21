@@ -130,8 +130,8 @@ local function startScript(char)
         local minDist = 1000
 
         for _, npc in pairs(workspace:WaitForChild("NPCs"):GetChildren()) do
-            -- Chỉ tìm Hollow1-5
-            if (npc.Name == "Hollow1" or npc.Name == "Hollow2" or npc.Name == "Hollow3" or npc.Name == "Hollow4" or npc.Name == "Hollow5") and npc:FindFirstChild("HumanoidRootPart") then
+            -- Chỉ tìm DesertBandit1-5
+            if (npc.Name == "DesertBandit1" or npc.Name == "DesertBandit2" or npc.Name == "DesertBandit3" or npc.Name == "DesertBandit4" or npc.Name == "DesertBandit5") and npc:FindFirstChild("HumanoidRootPart") then
                 if npc.Humanoid.Health > 0 then
                     local dist = (npc.HumanoidRootPart.Position - root.Position).Magnitude
                     if dist < minDist then
