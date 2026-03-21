@@ -29,11 +29,11 @@ task.spawn(function()
     local levelValue = player:WaitForChild("Data"):WaitForChild("Level")
 
     while true do
-        if levelValue.Value >= 200 and not triggered then
+        if levelValue.Value >= 100 and not triggered then
             triggered = true
             STOP = true
 
-            warn("Reached level 200 → STOP + RESET")
+            warn("Reached level 100 → STOP + RESET")
 
             -- dừng toàn bộ
             stopAll()
@@ -218,7 +218,7 @@ local function startScript(char)
             local level = player.Data.Level.Value
             local stat = player.Data.StatPoints.Value
 
-            if level >= 1 and level <= 200 and stat > 0 then
+            if level >= 1 and level <= 100 and stat > 0 then
                 statRemote:FireServer("Melee", stat)
             end
 
