@@ -110,99 +110,46 @@ local function startScript(char)
     local QUEST_NAME = "QuestNPC11"
     local REQUIRED_KILLS = 5
 
-    local killCount = 0
-    local currentTarget = nil
-    local lastQuestTime = 0
-
-    local function acceptQuest()
-        if STOP then return end
-        if tick() - lastQuestTime > 5 then
-            lastQuestTime = tick()
-            questRemote:FireServer(QUEST_NAME)
-        end
-    end
-
-    task.delay(1, acceptQuest)
-
-    -- ===== FIND NPC =====
-    local function getNearestNPC()
-        local nearest = nil
-        local minDist = 1000
-
-        for _, npc in pairs(workspace:WaitForChild("NPCs"):GetChildren()) do
-            -- Chỉ tìm Hollow1-5
-            if (npc.Name == "Hollow1" or npc.Name == "Hollow2" or npc.Name == "Hollow3" or npc.Name == "Hollow4" or npc.Name == "Hollow5") and npc:FindFirstChild("HumanoidRootPart") then
-                if npc.Humanoid.Health > 0 then
-                    local dist = (npc.HumanoidRootPart.Position - root.Position).Magnitude
-                    if dist < minDist then
-                        minDist = dist
-                        nearest = npc
-                    end
-                end
-            end
-        end
-
-        return nearest
-    end
-
-    -- ===== TRACK KILL =====
-    local tracked = {}
-
-    local function trackKill(npc)
-        if npc and npc:FindFirstChild("Humanoid") and not tracked[npc] then
-            tracked[npc] = true
-
-            npc.Humanoid.Died:Connect(function()
-                if STOP then return end
-
-                killCount += 1
-
-                if killCount >= REQUIRED_KILLS then
-                    killCount = 0
-                    task.wait(1)
-                    acceptQuest()
-                end
-            end)
-        end
-    end
-
-    -- ===== FOLLOW =====
-    local lastNPCPosition = nil
+    -- ===== TWEEN TO POSITION =====
+    local targetPos = Vector3.new(-376.26, 9, 1089.96)
+    local reachedTarget = false
     
     task.spawn(function()
-        while not STOP do
-            local npc = getNearestNPC()
-
-            if npc then
-                if npc ~= currentTarget then
-                    currentTarget = npc
-                    trackKill(npc)
-                end
-
-                while npc and npc.Parent and npc:FindFirstChild("Humanoid") and npc.Humanoid.Health > 0 and not STOP do
-                    local head = npc:FindFirstChild("Head") or npc:FindFirstChild("HumanoidRootPart")
-
-                    if head then
-                        lastNPCPosition = head.Position + Vector3.new(0, 10, 0)
-                        local direction = (lastNPCPosition - root.Position)
-
-                        root.Velocity = direction * 3
-                    end
-
-                    RunService.Heartbeat:Wait()
-                end
-            else
-                -- Nếu không tìm thấy NPC, neo tại vị trí NPC cuối cùng
-                if lastNPCPosition then
-                    local direction = (lastNPCPosition - root.Position)
-                    root.Velocity = direction * 3
-                    root.CFrame = CFrame.new(lastNPCPosition)
-                else
-                    task.wait(0.3)
-                end
-
-                RunService.Heartbeat:Wait()
+        while not reachedTarget and not STOP do
+            local distance = (root.Position - targetPos).Magnitude
+            
+            if distance < 5 then
+                reachedTarget = true
+                break
             end
+            
+            -- TWEEN
+            local speed = 100
+            local time = distance / speed
+            
+            local tween = TweenService:Create(
+                root,
+                TweenInfo.new(time, Enum.EasingStyle.Linear),
+                {CFrame = CFrame.new(targetPos)}
+            )
+            
+            tween:Play()
+            addConn(tween.Completed:Connect(function()
+                -- Tween completed
+            end))
+            
+            RunService.Heartbeat:Wait()
+        end
+        
+        -- ===== ANCHOR CHARACTER =====
+        if reachedTarget and not STOP then
+            task.wait(0.5)
+            for _, part in pairs(char:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.Anchored = true
+                end
+            end
+            root.CFrame = CFrame.new(targetPos)
         end
     end)
 
