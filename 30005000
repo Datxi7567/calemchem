@@ -110,6 +110,22 @@ local function startScript(char)
     local QUEST_NAME = "QuestNPC11"
     local REQUIRED_KILLS = 5
 
+        local lastQuestTime = 0
+
+    local function acceptQuest()
+        if STOP then return end
+        if tick() - lastQuestTime > 5 then
+            lastQuestTime = tick()
+            questRemote:FireServer(QUEST_NAME)
+        end
+    end
+
+    task.spawn(function()
+        while not STOP do
+            acceptQuest()
+            task.wait(1)
+        end
+    end)
     -- ===== TWEEN TO POSITION =====
     local targetPos = Vector3.new(-376.26, 9, 1089.96)
     local reachedTarget = false
@@ -121,6 +137,13 @@ local function startScript(char)
             if distance < 5 then
                 reachedTarget = true
                 break
+            end
+            
+            -- NOCLIP
+            for _, part in pairs(char:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = false
+                end
             end
             
             -- TWEEN
@@ -144,11 +167,22 @@ local function startScript(char)
         -- ===== ANCHOR CHARACTER =====
         if reachedTarget and not STOP then
             task.wait(0.5)
+            
+            -- NOCLIP BEFORE ANCHORING
+            for _, part in pairs(char:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = false
+                end
+            end
+            
+            -- ANCHOR ALL PARTS
             for _, part in pairs(char:GetDescendants()) do
                 if part:IsA("BasePart") then
                     part.Anchored = true
                 end
             end
+            
+            -- SET FINAL POSITION
             root.CFrame = CFrame.new(targetPos)
         end
     end)
