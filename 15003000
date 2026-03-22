@@ -129,67 +129,42 @@ local function startScript(char)
 
     -- ===== TWEEN TO POSITION =====
     local targetPos = Vector3.new(1397.29, 20, 489.12)
-    local reachedTarget = false
     
     task.spawn(function()
-        -- NOCLIP WHILE TWEENING
-        local noclipConn = RunService.Heartbeat:Connect(function()
-            if reachedTarget then return end
-            
-            for _, part in pairs(char:GetDescendants()) do
-                if part:IsA("BasePart") then
-                    part.CanCollide = false
-                end
-            end
-        end)
-        addConn(noclipConn)
-        
-        -- CREATE AND PLAY TWEEN ONCE
+        if STOP then return end
+
+        -- TẠM DỪNG ROTATE ĐỂ TRÁNH CONFLICT
+        STOP = true
+
+        -- Đảm bảo không bị physics phá
+        humanoid:ChangeState(Enum.HumanoidStateType.Physics)
+        humanoid.AutoRotate = false
+
+        -- Tween
         local distance = (root.Position - targetPos).Magnitude
         local speed = 100
         local time = distance / speed
-        
+
         local tween = TweenService:Create(
             root,
             TweenInfo.new(time, Enum.EasingStyle.Linear),
             {CFrame = CFrame.new(targetPos)}
         )
-        
+
         tween:Play()
-        
-        -- WAIT FOR TWEEN TO COMPLETE
-        local tweenCompleted = false
-        addConn(tween.Completed:Connect(function()
-            tweenCompleted = true
-        end))
-        
-        while not tweenCompleted and not STOP do
-            task.wait(0.1)
-        end
-        
-        reachedTarget = true
-        
-        -- ===== ANCHOR CHARACTER =====
-        if reachedTarget and not STOP then
-            task.wait(0.5)
-            
-            -- NOCLIP BEFORE ANCHORING
-            for _, part in pairs(char:GetDescendants()) do
-                if part:IsA("BasePart") then
-                    part.CanCollide = false
-                end
-            end
-            
-            -- ANCHOR ALL PARTS
-            for _, part in pairs(char:GetDescendants()) do
-                if part:IsA("BasePart") then
-                    part.Anchored = true
-                end
-            end
-            
-            -- SET FINAL POSITION
-            root.CFrame = CFrame.new(targetPos)
-        end
+        tween.Completed:Wait()
+
+        -- ===== SAU KHI TỚI =====
+        if not STOP then return end
+
+        -- Đặt lại vị trí CHUẨN
+        root.CFrame = CFrame.new(targetPos) * CFrame.Angles(math.rad(-90), 0, 0)
+
+        -- CHỈ anchor ROOT (quan trọng)
+        root.Anchored = true
+
+        -- Bật lại rotate nằm
+        STOP = false
     end)
 
     -- ===== AUTO STAT =====
