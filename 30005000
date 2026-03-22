@@ -103,92 +103,55 @@ local function startScript(char)
     end))
 
     -- ===== QUEST =====
-    local questRemote = game:GetService("ReplicatedStorage")
-        :WaitForChild("RemoteEvents")
-        :WaitForChild("QuestAccept")
-
-    local QUEST_NAME = "QuestNPC11"
-    local REQUIRED_KILLS = 5
-
-        local lastQuestTime = 0
-
-    local function acceptQuest()
-        if STOP then return end
-        if tick() - lastQuestTime > 5 then
-            lastQuestTime = tick()
-            questRemote:FireServer(QUEST_NAME)
-        end
-    end
-
-    task.spawn(function()
+        task.spawn(function()
         while not STOP do
-            acceptQuest()
-            task.wait(1)
+            if STOP then break end
+            local args = {
+                "QuestNPC11"
+            }
+            game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):WaitForChild("QuestAccept"):FireServer(unpack(args))
+            task.wait(5)
         end
     end)
+
     -- ===== TWEEN TO POSITION =====
     local targetPos = Vector3.new(-376.26, 9, 1089.96)
-    local reachedTarget = false
-    
+
     task.spawn(function()
-        -- NOCLIP WHILE TWEENING
-        local noclipConn = RunService.Heartbeat:Connect(function()
-            if reachedTarget then return end
-            
-            for _, part in pairs(char:GetDescendants()) do
-                if part:IsA("BasePart") then
-                    part.CanCollide = false
-                end
-            end
-        end)
-        addConn(noclipConn)
-        
-        -- CREATE AND PLAY TWEEN ONCE
+        if STOP then return end
+
+        -- TẠM DỪNG ROTATE ĐỂ TRÁNH CONFLICT
+        STOP = true
+
+        -- Đảm bảo không bị physics phá
+        humanoid:ChangeState(Enum.HumanoidStateType.Physics)
+        humanoid.AutoRotate = false
+
+        -- Tween
         local distance = (root.Position - targetPos).Magnitude
         local speed = 100
         local time = distance / speed
-        
+
         local tween = TweenService:Create(
             root,
             TweenInfo.new(time, Enum.EasingStyle.Linear),
             {CFrame = CFrame.new(targetPos)}
         )
-        
+
         tween:Play()
-        
-        -- WAIT FOR TWEEN TO COMPLETE
-        local tweenCompleted = false
-        addConn(tween.Completed:Connect(function()
-            tweenCompleted = true
-        end))
-        
-        while not tweenCompleted and not STOP do
-            task.wait(0.1)
-        end
-        
-        reachedTarget = true
-        
-        -- ===== ANCHOR CHARACTER =====
-        if reachedTarget and not STOP then
-            task.wait(0.5)
-            
-            -- NOCLIP BEFORE ANCHORING
-            for _, part in pairs(char:GetDescendants()) do
-                if part:IsA("BasePart") then
-                    part.CanCollide = false
-                end
-            end
-            
-            -- ANCHOR ALL PARTS
-            for _, part in pairs(char:GetDescendants()) do
-                if part:IsA("BasePart") then
-                    part.Anchored = true
-                end
-            end
-            
-            -- SET FINAL POSITION
-            root.CFrame = CFrame.new(targetPos)
-        end
+        tween.Completed:Wait()
+
+        -- ===== SAU KHI TỚI =====
+        if not STOP then return end
+
+        -- Đặt lại vị trí CHUẨN
+        root.CFrame = CFrame.new(targetPos) * CFrame.Angles(math.rad(-90), 0, 0)
+
+        -- CHỈ anchor ROOT (quan trọng)
+        root.Anchored = true
+
+        -- Bật lại rotate nằm
+        STOP = false
     end)
 
     -- ===== AUTO STAT =====
