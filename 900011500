@@ -115,7 +115,7 @@ local function startScript(char)
     end)
 
     -- ===== TWEEN TO POSITION =====
-    local targetPos = Vector3.new(-1271, 10, -1188.92)
+    local targetPos = Vector3.new(-1271, 10.5, -1188.92)
 
     task.spawn(function()
         if STOP then return end
