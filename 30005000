@@ -131,38 +131,42 @@ local function startScript(char)
     local reachedTarget = false
     
     task.spawn(function()
-        while not reachedTarget and not STOP do
-            local distance = (root.Position - targetPos).Magnitude
+        -- NOCLIP WHILE TWEENING
+        local noclipConn = RunService.Heartbeat:Connect(function()
+            if reachedTarget then return end
             
-            if distance < 5 then
-                reachedTarget = true
-                break
-            end
-            
-            -- NOCLIP
             for _, part in pairs(char:GetDescendants()) do
                 if part:IsA("BasePart") then
                     part.CanCollide = false
                 end
             end
-            
-            -- TWEEN
-            local speed = 100
-            local time = distance / speed
-            
-            local tween = TweenService:Create(
-                root,
-                TweenInfo.new(time, Enum.EasingStyle.Linear),
-                {CFrame = CFrame.new(targetPos)}
-            )
-            
-            tween:Play()
-            addConn(tween.Completed:Connect(function()
-                -- Tween completed
-            end))
-            
-            RunService.Heartbeat:Wait()
+        end)
+        addConn(noclipConn)
+        
+        -- CREATE AND PLAY TWEEN ONCE
+        local distance = (root.Position - targetPos).Magnitude
+        local speed = 100
+        local time = distance / speed
+        
+        local tween = TweenService:Create(
+            root,
+            TweenInfo.new(time, Enum.EasingStyle.Linear),
+            {CFrame = CFrame.new(targetPos)}
+        )
+        
+        tween:Play()
+        
+        -- WAIT FOR TWEEN TO COMPLETE
+        local tweenCompleted = false
+        addConn(tween.Completed:Connect(function()
+            tweenCompleted = true
+        end))
+        
+        while not tweenCompleted and not STOP do
+            task.wait(0.1)
         end
+        
+        reachedTarget = true
         
         -- ===== ANCHOR CHARACTER =====
         if reachedTarget and not STOP then
