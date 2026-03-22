@@ -148,7 +148,7 @@ local function startScript(char)
             end
             
             -- TWEEN
-            local speed = 20
+            local speed = 100
             local time = distance / speed
             
             local tween = TweenService:Create(
