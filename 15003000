@@ -107,7 +107,7 @@ local function startScript(char)
         while not STOP do
             if STOP then break end
             local args = {
-                "QuestNPC11"
+                "QuestNPC9"
             }
             game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):WaitForChild("QuestAccept"):FireServer(unpack(args))
             task.wait(5)
