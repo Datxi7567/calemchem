@@ -107,7 +107,7 @@ local function startScript(char)
         :WaitForChild("RemoteEvents")
         :WaitForChild("QuestAccept")
 
-    local QUEST_NAME = "QuestNPC6"
+    local QUEST_NAME = "QuestNPC5"
     local REQUIRED_KILLS = 5
 
     local killCount = 0
