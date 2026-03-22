@@ -103,27 +103,14 @@ local function startScript(char)
     end))
 
     -- ===== QUEST =====
-    local questRemote = game:GetService("ReplicatedStorage")
-        :WaitForChild("RemoteEvents")
-        :WaitForChild("QuestAccept")
-
-    local QUEST_NAME = "QuestNPC14"
-    local REQUIRED_KILLS = 5
-
-    local lastQuestTime = 0
-
-    local function acceptQuest()
-        if STOP then return end
-        if tick() - lastQuestTime > 5 then
-            lastQuestTime = tick()
-            questRemote:FireServer(QUEST_NAME)
-        end
-    end
-
     task.spawn(function()
         while not STOP do
-            acceptQuest()
-            task.wait(1)
+            if STOP then break end
+            local args = {
+                "QuestNPC14"
+            }
+            game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):WaitForChild("QuestAccept"):FireServer(unpack(args))
+            task.wait(5)
         end
     end)
 
