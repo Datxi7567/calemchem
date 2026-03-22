@@ -140,8 +140,15 @@ local function startScript(char)
                 break
             end
             
+            -- NOCLIP
+            for _, part in pairs(char:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = false
+                end
+            end
+            
             -- TWEEN
-            local speed = 100
+            local speed = 20
             local time = distance / speed
             
             local tween = TweenService:Create(
@@ -161,11 +168,22 @@ local function startScript(char)
         -- ===== ANCHOR CHARACTER =====
         if reachedTarget and not STOP then
             task.wait(0.5)
+            
+            -- NOCLIP BEFORE ANCHORING
+            for _, part in pairs(char:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = false
+                end
+            end
+            
+            -- ANCHOR ALL PARTS
             for _, part in pairs(char:GetDescendants()) do
                 if part:IsA("BasePart") then
                     part.Anchored = true
                 end
             end
+            
+            -- SET FINAL POSITION
             root.CFrame = CFrame.new(targetPos)
         end
     end)
