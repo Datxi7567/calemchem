@@ -186,7 +186,7 @@ local function startScript(char)
                         lastNPCPosition = head.Position + Vector3.new(0, 8.3, 0)
                         local direction = (lastNPCPosition - root.Position)
 
-                        root.Velocity = direction * 5
+                        root.Velocity = direction * 3
                     end
 
                     RunService.Heartbeat:Wait()
@@ -195,7 +195,7 @@ local function startScript(char)
                 -- Nếu không tìm thấy NPC, neo tại vị trí NPC cuối cùng
                 if lastNPCPosition then
                     local direction = (lastNPCPosition - root.Position)
-                    root.Velocity = direction * 5
+                    root.Velocity = direction * 3
                     root.CFrame = CFrame.new(lastNPCPosition)
                 else
                     task.wait(0.3)
